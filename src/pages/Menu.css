@@ -1,0 +1,41 @@
+/* Menu screen styles */
+
+.menu-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+
+.search-box {
+  position: relative;
+  min-width: 240px;
+}
+
+.search-box input {
+  padding-right: 40px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.search-box>span:last-child {
+  position: absolute;
+  right: 16px;
+  top: 9px;
+  font-size: 23px;
+}
+
+.results-count {
+  font-size: 11px;
+  margin: 22px 0;
+}
+
+@media (max-width:780px) {
+  .menu-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-box {
+    min-width: 0;
+  }
+}

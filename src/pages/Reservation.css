@@ -1,0 +1,59 @@
+/* Reservation screen styles */
+
+.booking-aside {
+  background: var(--sage);
+  padding: 38px;
+  border-radius: 12px;
+  position: relative;
+}
+
+.aside-art {
+  font-size: 80px;
+  color: #b8c59e;
+  line-height: 1;
+  margin-bottom: 25px;
+}
+
+.booking-aside h2 {
+  font-size: 35px;
+  line-height: 1.2;
+  margin: 17px 0 25px;
+}
+
+.booking-aside ul {
+  padding-left: 18px;
+  font-size: 13px;
+  line-height: 2.5;
+  color: #68745c;
+}
+
+.booking-aside small {
+  font-size: 10px;
+  color: #6d785e;
+}
+
+.availability {
+  border-top: 1px solid #cfd9c2;
+  padding: 20px 0 13px;
+  margin-top: 20px;
+  font-size: 12px;
+}
+
+@media (max-width:780px) {
+  .booking-aside {
+    padding: 28px;
+  }
+  .aside-art {
+    font-size: 50px;
+    margin-bottom: 15px;
+  }
+  .booking-aside h2 {
+    font-size: 30px;
+  }
+}
+
+@media (max-width:450px) {
+  .booking-aside ul {
+    font-size: 12px;
+  }
+}

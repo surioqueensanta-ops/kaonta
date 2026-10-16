@@ -1,0 +1,15 @@
+/* Keep the notice strip and navbar visible while scrolling. */
+.fixed-navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: var(--cream);
+  box-shadow: 0 3px 12px rgba(32, 75, 58, .06);
+}
+
+/* Height is measured in React, including wrapped navigation on phones. */
+.navigation-spacer {
+  flex-shrink: 0;
+}

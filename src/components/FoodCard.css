@@ -1,0 +1,3 @@
+/* Photos supplied for KaonHub menu dishes. */
+.dish-photo { display: block; width: 100%; height: 100%; object-fit: cover; }
+.dish-art .dish-tag { z-index: 1; background: rgba(255, 250, 239, .94); }
