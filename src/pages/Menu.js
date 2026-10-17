@@ -7,6 +7,7 @@ import './Menu.css';
 // Edit this screen's HTML-like JSX below. Shared state arrives through props.
 export default function Menu({
   add,
+  onView,
   category,
   query,
   setCategory,
@@ -29,7 +30,7 @@ export default function Menu({
     </div>
     <p className="results-count">{shownMenu.length} dishes to make your day</p>
     <div className="food-grid">
-      {shownMenu.map(item => <FoodCard key={item.id} item={item} onAdd={add} />)}
+      {shownMenu.map(item => <FoodCard key={item.id} item={item} onView={onView} onAdd={add} />)}
     </div>
     {!shownMenu.length && <div className="empty-state">
       <h2>No dishes found.</h2>

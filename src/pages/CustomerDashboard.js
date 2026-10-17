@@ -2,10 +2,14 @@ import React from 'react';
 import { peso, stepsFor, niceDate, niceTime } from '../utils/formatters';
 import PageHeading from '../components/PageHeading';
 import Status from '../components/Status';
+import ReviewEditor from '../components/ReviewEditor';
+import { canReview } from '../utils/reviewRules';
 import './CustomerDashboard.css';
 
 // Edit this screen's HTML-like JSX below. Shared state arrives through props.
 export default function CustomerDashboard({
+  reviews,
+  saveReview,
   bookingStatus,
   go,
   mineBookings,
@@ -40,6 +44,9 @@ export default function CustomerDashboard({
         bookingStatus(b.id, 'Cancelled');
         setNotice('Reservation cancelled. Your sample table has been released.');
       }}>Cancel reservation</button>}
+      {canReview(user, 'booking', b) && <ReviewEditor referenceId={b.id}
+        review={reviews.find(review => review.type === 'booking' && review.targetId === b.id)}
+        onSave={data => saveReview('booking', b.id, data)} />}
     </article>)}
     <h2 className="list-heading">Food orders <span>
         {mineOrders.length}
@@ -73,6 +80,9 @@ export default function CustomerDashboard({
         </li>)}
       </ol>}
       <small>Status updates are entered by the restaurant through the demo admin account.</small>
+      {canReview(user, 'order', o) && <ReviewEditor referenceId={o.id} delivery={o.service === 'Delivery'}
+        review={reviews.find(review => review.type === 'order' && review.targetId === o.id)}
+        onSave={data => saveReview('order', o.id, data)} />}
     </article>)}
   </section>;
 }

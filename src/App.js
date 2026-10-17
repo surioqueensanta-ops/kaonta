@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import './Motion.css';
 import { initialMenu, sampleAccounts } from './data/restaurantData';
 import { today, newId } from './utils/formatters';
 import Brand from './components/Brand';
@@ -11,10 +12,14 @@ import Reservation from './pages/Reservation';
 import Checkout from './pages/Checkout';
 import CustomerDashboard from './pages/CustomerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Reviews from './pages/Reviews';
+import FoodDetails from './components/FoodDetails';
+import { canReview, validateReviewInput } from './utils/reviewRules';
 
 // App coordinates shared data and navigation. Edit screen layouts in src/pages.
 export default function App() {
   const [view, setView] = useState('home');
+  const [selectedFood, setSelectedFood] = useState(null);
   const [menu, setMenu] = useState(initialMenu);
   const [category, setCategory] = useState('All dishes');
   const [query, setQuery] = useState('');
@@ -26,11 +31,12 @@ export default function App() {
   const [afterLogin, setAfterLogin] = useState('activity');
   const [orders, setOrders] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [notice, setNotice] = useState('');
   const [service, setService] = useState('Delivery');
   const [zone, setZone] = useState('Central zone');
   const [preorder, setPreorder] = useState(false);
-  const [adminTab, setAdminTab] = useState('Reservations');
+  const [adminTab, setAdminTab] = useState('Overview');
   const [visitDate, setVisitDate] = useState(today());
   const [visitTime, setVisitTime] = useState('17:00');
   const cartItems = cart.map(line => ({
@@ -47,7 +53,7 @@ export default function App() {
     setView(next);
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'
     });
   }
   function requireLogin(next) {
@@ -57,16 +63,21 @@ export default function App() {
     go('auth');
     setNotice('Please log in or create a demo account to continue.');
   }
-  function add(id) {
-    if (!menu.find(item => item.id === id)?.available) return;
+  function add(id, count = 1) {
+    if (!menu.find(item => item.id === id)?.available) return false;
+    if (!Number.isInteger(count) || count < 1 || (cart.find(item => item.id === id)?.quantity || 0) + count > 20) {
+      setNotice('You can add up to 20 of each dish.');
+      return false;
+    }
     setCart(lines => lines.some(line => line.id === id) ? lines.map(line => line.id === id ? {
       ...line,
-      quantity: Math.min(20, line.quantity + 1)
+      quantity: line.quantity + count
     } : line) : [...lines, {
       id,
-      quantity: 1
+      quantity: count
     }]);
-    setNotice(`${menu.find(item => item.id === id).name} added to your order.`);
+    setNotice(`Good choice! ${menu.find(item => item.id === id).name} added to your bag.`);
+    return true;
   }
   function quantity(id, delta) {
     setCart(lines => lines.map(line => line.id === id ? {
@@ -149,6 +160,7 @@ export default function App() {
     setOrders(list => [{
       ...data,
       id: newId('KH-O'),
+      createdAt: new Date().toISOString(),
       email: user.email,
       name: user.name,
       items: cartItems.map(item => ({
@@ -193,6 +205,41 @@ export default function App() {
     event.currentTarget.reset();
     setNotice('New dish added to the demo menu.');
   }
+  function saveReview(type, targetId, data) {
+    const target = (type === 'booking' ? bookings : orders).find(item => item.id === targetId);
+    if (!canReview(user, type, target)) {
+      setNotice('Only the customer can review their own completed visit or order.');
+      return false;
+    }
+    const delivery = type === 'order' && target.service === 'Delivery';
+    const error = validateReviewInput(data, delivery);
+    if (error) { setNotice(error); return false; }
+    const now = new Date().toISOString();
+    const record = {
+      id: newId('KH-V'), type, targetId, email: user.email,
+      firstName: user.name.trim().split(/\s+/)[0],
+      service: type === 'booking' ? 'Dine-in visit' : target.service,
+      rating: Number(data.rating), comment: data.comment.trim(),
+      deliveryRating: delivery && data.deliveryRating ? Number(data.deliveryRating) : null,
+      createdAt: now, updatedAt: now
+    };
+    setReviews(previous => {
+      const existing = previous.find(review => review.type === type && review.targetId === targetId);
+      const updated = existing ? { ...existing, ...record, id: existing.id, createdAt: existing.createdAt, reply: existing.reply } : record;
+      return [updated, ...previous.filter(review => !(review.type === type && review.targetId === targetId))];
+    });
+    setNotice('Your review has been saved. Thank you for your feedback!');
+    return true;
+  }
+  function replyToReview(id, text) {
+    if (user?.role !== 'admin') return false;
+    const reply = String(text || '').trim();
+    if (!reply || reply.length > 500) { setNotice('Write a reply between 1 and 500 characters.'); return false; }
+    if (!reviews.some(review => review.id === id)) return false;
+    setReviews(previous => previous.map(review => review.id === id ? { ...review, reply } : review));
+    setNotice('Restaurant reply saved.');
+    return true;
+  }
   const mineBookings = bookings.filter(b => b.email === user?.email);
   const mineOrders = orders.filter(o => o.email === user?.email);
   return <div className="app-shell">
@@ -208,10 +255,11 @@ export default function App() {
         <button className={view === 'menu' ? 'nav-link active' : 'nav-link'} onClick={() => go('menu')}>Our menu</button>
         <button className={view === 'reserve' ? 'nav-link active' : 'nav-link'} onClick={() => requireLogin('reserve')}>Reserve a table</button>
         <button className={view === 'activity' ? 'nav-link active' : 'nav-link'} onClick={() => requireLogin('activity')}>My activity</button>
+        <button className={view === 'reviews' ? 'nav-link active' : 'nav-link'} onClick={() => go('reviews')}>Reviews</button>
         {user?.role === 'admin' && <button className={view === 'admin' ? 'nav-link active' : 'nav-link'} onClick={() => go('admin')}>Admin</button>}
       </nav>
       <div className="header-actions">
-        <button className="cart-button" onClick={() => go('cart')} aria-label={`Cart, ${itemCount} items`}>Bag <span>
+        <button className="cart-button" onClick={() => go('cart')} aria-label={`Cart, ${itemCount} items`}>Bag <span key={itemCount} className={itemCount ? 'cart-count cart-count-updated' : 'cart-count'}>
             {itemCount}
           </span></button>
         {user ? <button className="login-button" onClick={() => {
@@ -222,7 +270,7 @@ export default function App() {
           setAuthMode('login');
           setAfterLogin('activity');
           go('auth');
-        }}>Log in <span aria-hidden="true">↗</span></button>}
+        }}>Log in</button>}
       </div>
     </header>
     </FixedNavigation>
@@ -231,14 +279,23 @@ export default function App() {
         {notice}
         {notice && <button onClick={() => setNotice('')} aria-label="Dismiss notification">×</button>}
       </div>
-      {view === 'home' && <Home add={add} go={go} menu={menu} requireLogin={requireLogin} setService={setService} />}
-      {view === 'menu' && <Menu add={add} category={category} query={query} setCategory={setCategory} setQuery={setQuery} shownMenu={shownMenu} />}
+      <div className="page-transition" key={view}>
+      {view === 'home' && <Home onView={setSelectedFood} add={add} go={go} menu={menu} requireLogin={requireLogin} setService={setService} />}
+      {view === 'menu' && <Menu onView={setSelectedFood} add={add} category={category} query={query} setCategory={setCategory} setQuery={setQuery} shownMenu={shownMenu} />}
       {view === 'auth' && <Login authMode={authMode} authenticate={authenticate} setAuthMode={setAuthMode} setNotice={setNotice} />}
       {view === 'reserve' && user && <Reservation go={go} itemCount={itemCount} preorder={preorder} setPreorder={setPreorder} setVisitDate={setVisitDate} setVisitTime={setVisitTime} slotsLeft={slotsLeft} submitBooking={submitBooking} subtotal={subtotal} user={user} visitDate={visitDate} visitTime={visitTime} />}
       {view === 'cart' && <Checkout cart={cart} cartItems={cartItems} deliveryFee={deliveryFee} go={go} itemCount={itemCount} placeOrder={placeOrder} quantity={quantity} requireLogin={requireLogin} service={service} setCart={setCart} setService={setService} setZone={setZone} subtotal={subtotal} user={user} zone={zone} />}
-      {view === 'activity' && user && <CustomerDashboard bookingStatus={bookingStatus} go={go} mineBookings={mineBookings} mineOrders={mineOrders} setNotice={setNotice} user={user} />}
+      {view === 'activity' && user && <CustomerDashboard reviews={reviews} saveReview={saveReview} bookingStatus={bookingStatus} go={go} mineBookings={mineBookings} mineOrders={mineOrders} setNotice={setNotice} user={user} />}
+      {view === 'reviews' && <Reviews reviews={reviews} user={user} onReply={replyToReview} go={go} />}
       {view === 'admin' && user?.role === 'admin' && <AdminDashboard addDish={addDish} adminTab={adminTab} bookingStatus={bookingStatus} bookings={bookings} menu={menu} nextOrder={nextOrder} orders={orders} setAdminTab={setAdminTab} setMenu={setMenu} setOrders={setOrders} />}
+      </div>
     </main>
+    <FoodDetails key={selectedFood || 'closed'} item={menu.find(item => item.id === selectedFood)} onClose={() => setSelectedFood(null)} onAdd={add}
+      reviews={reviews.filter(review => {
+        const target = (review.type === 'booking' ? bookings : orders).find(activity => activity.id === review.targetId);
+        const completed = review.type === 'booking' ? target?.status === 'Completed' : target?.step === 4 && !target?.cancelled;
+        return completed && target?.items?.some(item => item.id === selectedFood);
+      })} />
     <footer className="site-footer">
       <div>
         <Brand onClick={() => go('home')} />

@@ -1,0 +1,41 @@
+/* KaonHub interaction polish. No extra animation library is needed. */
+.food-card {
+  transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+}
+.dish-photo { transition: transform 420ms cubic-bezier(.2,.65,.3,1); transform-origin: center; }
+.hero-meal-photo { transition: transform 420ms ease, box-shadow 420ms ease; }
+.primary, .secondary, .add-button, .login-button, .chip {
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+.add-button { min-width: 100px; }
+.add-button.is-added { background: var(--green); color: white; border-color: var(--green); }
+.food-card:focus-within { box-shadow: 0 10px 28px rgba(32,75,58,.11); border-color: #a9bea0; }
+.food-card:focus-within .dish-photo { transform: scale(1.045); }
+.primary:focus-visible, .secondary:focus-visible, .add-button:focus-visible { box-shadow: 0 4px 12px rgba(32,75,58,.16); }
+@media (hover: hover) and (pointer: fine) {
+  .food-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(32,75,58,.12); border-color: #b7c7ac; }
+  .food-card:hover .dish-photo { transform: scale(1.06); }
+  .hero-meal-photo:hover { transform: scale(1.025); box-shadow: 12px 26px 36px rgba(48,73,44,.22); }
+  .primary:hover:not(:disabled), .login-button:hover:not(:disabled) { background: #153a2b; box-shadow: 0 5px 14px rgba(32,75,58,.15); transform: translateY(-1px); }
+  .secondary:hover:not(:disabled), .add-button:hover:not(:disabled) { background: #e8efdf; border-color: #9fb494; }
+  .add-button.is-added:hover { background: var(--green); }
+  .chip:not(.selected):hover { background: #eef2e7; border-color: #b7c7ac; }
+  .review-star-option:hover { color: var(--orange); }
+}
+.primary:active:not(:disabled), .secondary:active:not(:disabled), .add-button:active:not(:disabled) { transform: translateY(1px); }
+.cart-count { display: inline-grid; }
+.cart-count-updated { animation: kaonhub-cart-pop 260ms ease-out; }
+.page-transition { animation: kaonhub-page-in 180ms ease-out; }
+@keyframes kaonhub-cart-pop { 0% { transform: scale(.88); } 55% { transform: scale(1.16); } 100% { transform: scale(1); } }
+@keyframes kaonhub-page-in { from { opacity: .35; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .food-card:hover, .food-card:focus-within,
+  .food-card:hover .dish-photo, .food-card:focus-within .dish-photo,
+  .hero-meal-photo:hover { transform: none !important; }
+}

@@ -5,6 +5,7 @@ import './Home.css';
 // Edit this screen's HTML-like JSX below. Shared state arrives through props.
 export default function Home({
   add,
+  onView,
   go,
   menu,
   requireLogin,
@@ -65,7 +66,7 @@ export default function Home({
         <button className="text-button" onClick={() => go('menu')}>See full menu →</button>
       </div>
       <div className="food-grid">
-        {menu.slice(0, 3).map(item => <FoodCard key={item.id} item={item} onAdd={add} />)}
+        {menu.slice(0, 3).map(item => <FoodCard key={item.id} item={item} onView={onView} onAdd={add} />)}
       </div>
     </section>
     <section className="reservation-banner">

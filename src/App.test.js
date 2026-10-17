@@ -24,10 +24,10 @@ test('sign up cannot create an administrator and rejects mismatched passwords', 
   fireEvent.change(screen.getByLabelText('Email address'), { target: { value: 'student@example.com' } });
   fireEvent.change(screen.getByLabelText('Password', { exact: true }), { target: { value: 'Sample123!' } });
   fireEvent.change(screen.getByLabelText('Confirm password'), { target: { value: 'Mismatch123!' } });
-  fireEvent.submit(screen.getByRole('button', { name: 'Create demo account →' }).closest('form'));
+  fireEvent.submit(screen.getByRole('button', { name: 'Create Account' }).closest('form'));
   expect(screen.getByRole('status')).toHaveTextContent('Your passwords do not match.');
   fireEvent.change(screen.getByLabelText('Confirm password'), { target: { value: 'Sample123!' } });
-  fireEvent.submit(screen.getByRole('button', { name: 'Create demo account →' }).closest('form'));
+  fireEvent.submit(screen.getByRole('button', { name: 'Create Account' }).closest('form'));
   expect(screen.getByRole('heading', { name: 'Good things on the way.' })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Admin', exact: true })).not.toBeInTheDocument();
 });

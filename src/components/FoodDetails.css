@@ -1,0 +1,28 @@
+.food-preview { display:block; width:100%; border:0; padding:0; text-align:left; cursor:pointer; font:inherit; }
+.food-preview:focus-visible { outline:3px solid #c36137; outline-offset:3px; }
+.food-details { box-sizing:border-box; width:min(880px, calc(100% - 28px)); max-height:88dvh; padding:0; border:1px solid #d9ddcf; border-radius:24px; background:#faf9f3; color:#213e32; box-shadow:0 24px 90px #10291f40; overflow:auto; }
+.food-details::backdrop { background:#10291fb8; backdrop-filter:blur(5px); }
+.food-details-close { position:sticky; top:12px; float:right; margin:12px 12px -54px 0; z-index:2; width:40px; height:40px; border:1px solid #d9ddcf; border-radius:50%; background:#fffdf7; color:#213e32; font-size:28px; cursor:pointer; }
+.food-details-layout { display:grid; grid-template-columns:1fr 1fr; }
+.food-details-image { min-height:330px; background:#e4e9d9; display:grid; place-items:center; overflow:hidden; }
+.food-details-image img { width:100%; height:100%; max-height:480px; object-fit:cover; }
+.food-details-image span { font-size:100px; }
+.food-details-copy { padding:54px 28px 20px; }
+.food-details h2 { font-size:34px; line-height:1.15; margin:14px 0; }
+.food-details-price { font-size:24px; color:#ae512c; }
+.food-details-copy p,.food-details-reviews p { line-height:1.65; }
+.food-details-availability { font-size:14px; }
+.food-details-actions { display:flex; gap:10px; margin-top:8px; }
+.food-details-actions input { box-sizing:border-box; width:72px; padding:10px; border:1px solid #b9c4b6; border-radius:10px; font:inherit; }
+.food-details-actions .primary { flex:1; padding:12px; }
+.food-details-feedback { min-height:24px; font-size:14px; }
+.food-details-reviews { padding:24px 28px 32px; border-top:1px solid #d9ddcf; }
+.food-details-reviews h3 { margin:0; font-size:23px; }
+.food-details-reviews h3 span { color:#ae512c; }
+.food-details-empty { background:#e9eddf; padding:18px; border-radius:12px; }
+.food-details-review { border-top:1px solid #d9ddcf; padding:20px 0; overflow-wrap:anywhere; }
+.food-details-review small { display:block; margin-top:6px; }
+.food-details-stars { color:#ae512c; letter-spacing:2px; }
+.food-details-review blockquote { margin:12px 0 0; padding:14px; background:#e9eddf; border-radius:10px; }
+.food-details-review blockquote p { margin-bottom:0; }
+@media(max-width:600px) { .food-details-layout { grid-template-columns:1fr; } .food-details-image { min-height:0; height:230px; } .food-details-copy { padding:24px 20px 12px; } .food-details-reviews { padding:22px 20px; } .food-details h2 { font-size:28px; } }

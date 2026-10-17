@@ -42,15 +42,9 @@ export default function Login({
         <label>Password<input name="password" type="password" autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'} required minLength={8} /></label>
         {authMode === 'signup' && <label>Confirm password<input name="confirm" type="password" autoComplete="new-password" required minLength={8} /></label>}
         <button className="primary full-width">
-          {authMode === 'login' ? 'Log in →' : 'Create demo account →'}
+          {authMode === 'login' ? 'Log in' : 'Create Account'}
         </button>
       </form>
-      <div className="demo-accounts">
-        <strong>Try a sample account</strong>
-        <p>Customer: <code>customer@kaonhub.demo</code><br />Password: <code>Demo123!</code></p>
-        <p>Admin: <code>admin@kaonhub.demo</code><br />Password: <code>Admin123!</code></p>
-        <small>Classroom simulation only. Use a made-up password. Accounts are held in memory and reset on refresh. Real authentication needs a secure backend.</small>
-      </div>
     </div>
   </section>;
 }

@@ -1,0 +1,22 @@
+.reviews-summary { display: grid; grid-template-columns: 190px 1fr; align-items: center; gap: 35px; padding: 28px 32px; margin-bottom: 30px; background: var(--sage); border-radius: 12px; }
+.reviews-average { font-family: Georgia, serif; font-size: 48px; color: var(--green); }
+.reviews-average small { font-family: 'Segoe UI', sans-serif; font-size: 14px; color: var(--muted); margin-left: 10px; }
+.reviews-summary p { font-size: 12px; margin: 8px 0 0; }
+.reviews-summary strong { font-size: 14px; }
+.reviews-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.customer-review { min-width: 0; }
+.review-card-top { display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+.review-author { display: flex; align-items: center; gap: 12px; }
+.review-avatar { display: grid; place-items: center; border-radius: 50%; width: 40px; height: 40px; background: var(--sage); color: var(--green); font-weight: 650; }
+.review-author h3 { font-size: 15px; margin: 0 0 3px; }
+.review-author small { font-size: 10px; color: var(--muted); }
+.verified-review { font-size: 10px; padding: 6px 9px; border-radius: 20px; background: #edf3e6; color: var(--green); }
+.published-stars { margin: 20px 0 5px; color: var(--orange); font-size: 23px; letter-spacing: 3px; }
+.published-stars span { color: #929e87; }
+.review-service { color: var(--muted); font-size: 10px; }
+.review-comment { margin: 16px 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }
+.restaurant-reply { background: #f3f5ee; border-left: 3px solid var(--green); padding: 15px 18px; margin-top: 20px; }
+.restaurant-reply strong { font-size: 12px; }
+.restaurant-reply p { font-size: 12px; margin: 8px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.review-reply-form { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 20px; }
+@media (max-width: 780px) { .reviews-list { grid-template-columns: 1fr; } .reviews-summary { grid-template-columns: 1fr; gap: 18px; padding: 24px; } }

@@ -1,12 +1,24 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { peso } from '../utils/formatters';
 import './FoodCard.css';
 export default function FoodCard({
   item,
-  onAdd
+  onAdd,
+  onView
 }) {
+  const [added, setAdded] = useState(false);
+  const feedbackTimer = useRef(null);
+  useEffect(() => () => clearTimeout(feedbackTimer.current), []);
+
+  function handleAdd() {
+    if (onAdd(item.id) === false) return;
+    setAdded(true);
+    clearTimeout(feedbackTimer.current);
+    feedbackTimer.current = setTimeout(() => setAdded(false), 1400);
+  }
+
   return <article className="food-card">
-    <div className={`dish-art ${item.color}`}>
+    <button type="button" className={`dish-art food-preview ${item.color}`} onClick={() => onView(item.id)} aria-label={`View ${item.name} details`}>
       <span className="dish-tag">
         {item.tag}
       </span>
@@ -17,7 +29,7 @@ export default function FoodCard({
       ) : (
         <div className="dish-plate" aria-hidden="true">{item.emoji}</div>
       )}
-    </div>
+    </button>
     <div className="dish-copy">
       <div className="dish-title">
         <h3>
@@ -34,8 +46,8 @@ export default function FoodCard({
         <span>
           {item.category}
         </span>
-        <button className="add-button" disabled={!item.available} onClick={() => onAdd(item.id)} aria-label={`Add ${item.name} to order`}>
-          {item.available ? 'Add to order +' : 'Sold out'}
+        <button className={added ? 'add-button is-added' : 'add-button'} disabled={!item.available} onClick={handleAdd} aria-label={`Add ${item.name} to order`}>
+          {!item.available ? 'Sold out' : added ? 'Added ✓' : 'Add to order +'}
         </button>
       </div>
     </div>
