@@ -82,7 +82,7 @@ export default function AdminDashboard({
             {b.status}
           </Status>
         </div>
-        <p>{niceDate(b.date)} · {niceTime(b.time)} · {b.seating} · {b.phone}</p>
+        <p>{niceDate(b.date)} · {niceTime(b.time)} · {b.tableName ? b.tableName + " · " : ""}{b.seating} · {b.phone}</p>
         {b.requests && <p>Request: {b.requests}</p>}
         {b.items.length > 0 && <p>Preorder: {b.items.map(i => `${i.name} × ${i.quantity}`).join(', ')} · {peso(b.total)}</p>}
         <div className="button-row">

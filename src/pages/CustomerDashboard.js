@@ -38,7 +38,7 @@ export default function CustomerDashboard({
           {b.status}
         </Status>
       </div>
-      <p>{b.guests} guests · {b.seating} seating preference</p>
+      <p>{b.tableName ? b.tableName + " · " : ""}{b.guests} guests · {b.seating}</p>
       {b.items.length > 0 && <p>Preorder: {b.items.map(i => `${i.name} × ${i.quantity}`).join(', ')} · {peso(b.total)}</p>}
       {['Pending', 'Confirmed'].includes(b.status) && <button className="secondary" disabled={new Date(`${b.date}T${b.time}`) <= new Date()} onClick={() => {
         bookingStatus(b.id, 'Cancelled');

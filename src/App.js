@@ -4,6 +4,7 @@ import './Motion.css';
 import { initialMenu, sampleAccounts } from './data/restaurantData';
 import { today, newId } from './utils/formatters';
 import Brand from './components/Brand';
+import { tables, tableAvailable } from './utils/tables';
 import FixedNavigation from './components/FixedNavigation';
 import Home from './pages/Home';
 import Menu from './pages/Menu';
@@ -47,7 +48,6 @@ export default function App() {
   const subtotal = cartItems.reduce((sum, line) => sum + line.price * line.quantity, 0);
   const deliveryFee = service === 'Delivery' && cart.length ? zone === 'Central zone' ? 50 : 80 : 0;
   const shownMenu = menu.filter(item => (category === 'All dishes' || item.category === category) && item.name.toLowerCase().includes(query.toLowerCase()));
-  const slotsLeft = Math.max(0, 5 - bookings.filter(b => b.date === visitDate && b.time === visitTime && !['Cancelled', 'Declined', 'Completed'].includes(b.status)).length);
   function go(next) {
     setNotice('');
     setView(next);
@@ -127,7 +127,8 @@ export default function App() {
     if (!user) return requireLogin('reserve');
     const data = Object.fromEntries(new FormData(event.currentTarget));
     if (new Date(`${visitDate}T${visitTime}`) <= new Date()) return setNotice('Choose a future reservation date and time.');
-    if (!slotsLeft) return setNotice('This time slot is full. Please choose another date or time.');
+    const table = tables.find(item => item.id === data.tableId);
+    if (!table || !tableAvailable(table, bookings, visitDate, visitTime, Number(data.guests))) return setNotice('Choose an available table that fits your group.');
     if (preorder && !cart.length) return setNotice('Add food to your cart first, or uncheck the preorder option.');
     if (preorder && cartItems.some(item => !item.available)) return setNotice('A preorder item is sold out. Please update your cart.');
     const booking = {
@@ -138,6 +139,10 @@ export default function App() {
       date: visitDate,
       time: visitTime,
       guests: Number(data.guests),
+      tableId: table.id,
+      tableName: table.name,
+      seating: table.area + " · " + table.location,
+      durationMinutes: 120,
       status: 'Pending',
       items: preorder ? cartItems.map(item => ({
         ...item
@@ -283,7 +288,7 @@ export default function App() {
       {view === 'home' && <Home onView={setSelectedFood} add={add} go={go} menu={menu} requireLogin={requireLogin} setService={setService} />}
       {view === 'menu' && <Menu onView={setSelectedFood} add={add} category={category} query={query} setCategory={setCategory} setQuery={setQuery} shownMenu={shownMenu} />}
       {view === 'auth' && <Login authMode={authMode} authenticate={authenticate} setAuthMode={setAuthMode} setNotice={setNotice} />}
-      {view === 'reserve' && user && <Reservation go={go} itemCount={itemCount} preorder={preorder} setPreorder={setPreorder} setVisitDate={setVisitDate} setVisitTime={setVisitTime} slotsLeft={slotsLeft} submitBooking={submitBooking} subtotal={subtotal} user={user} visitDate={visitDate} visitTime={visitTime} />}
+      {view === 'reserve' && user && <Reservation go={go} itemCount={itemCount} preorder={preorder} setPreorder={setPreorder} setVisitDate={setVisitDate} setVisitTime={setVisitTime} bookings={bookings} submitBooking={submitBooking} subtotal={subtotal} user={user} visitDate={visitDate} visitTime={visitTime} />}
       {view === 'cart' && <Checkout cart={cart} cartItems={cartItems} deliveryFee={deliveryFee} go={go} itemCount={itemCount} placeOrder={placeOrder} quantity={quantity} requireLogin={requireLogin} service={service} setCart={setCart} setService={setService} setZone={setZone} subtotal={subtotal} user={user} zone={zone} />}
       {view === 'activity' && user && <CustomerDashboard reviews={reviews} saveReview={saveReview} bookingStatus={bookingStatus} go={go} mineBookings={mineBookings} mineOrders={mineOrders} setNotice={setNotice} user={user} />}
       {view === 'reviews' && <Reviews reviews={reviews} user={user} onReply={replyToReview} go={go} />}
